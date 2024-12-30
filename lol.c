@@ -3,19 +3,28 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void enableRawMode() {
-    struct termios raw;
+// State of terminal originally
+struct termios original_termios;
 
-    tcgetattr(STDERR_FILENO, &raw);
+void disableRawMode() {
+    tcsetattr(STDERR_FILENO, TCSAFLUSH, &original_termios);
+}
+
+void enableRawMode() {
+    tcgetattr(STDERR_FILENO, &original_termios);
+    atexit(disableRawMode);
 
     /* 
        ECHO : bitflag/field 
        0000000000000000000000000000100 
     */
-    raw.c_lflag &= ~(ECHO);
+
+    struct termios raw = original_termios;
+    raw.c_lflag &= ~(ECHO | ICANON);
 
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
+
 
 int main() {
     enableRawMode();
