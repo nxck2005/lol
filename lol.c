@@ -7,10 +7,12 @@
 #include <ctype.h>
 
 
+
 /*** data ***/
 
 // State of terminal originally
 struct termios original_termios;
+
 
 
 /*** terminal ***/
@@ -57,6 +59,7 @@ void enableRawMode() {
 }
 
 
+
 /*** init ***/
 
 int main() {
@@ -65,16 +68,17 @@ int main() {
     while (1) {
         char c = '\0';
         read(STDIN_FILENO, &c, 1);
-        
+
         // Check if input is a nonprintable character
         // If yes, print ASCII code
         // If not, print ASCII code with reference to character
 
         if (iscntrl(c)) {
-            printf("%d\n", c);
+            printf("%d\r\n", c);
         } else {
             printf("%d ('%c')\r\n", c, c);
         }
+        if (c == 'q') break;
     }
     return 0;
 }
