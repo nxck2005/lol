@@ -1,11 +1,19 @@
+/*** includes ***/
+
 #include <unistd.h>
 #include <termios.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 
+
+/*** data ***/
+
 // State of terminal originally
 struct termios original_termios;
+
+
+/*** terminal ***/
 
 void disableRawMode() {
     tcsetattr(STDERR_FILENO, TCSAFLUSH, &original_termios);
@@ -42,6 +50,8 @@ void enableRawMode() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
 
+
+/*** init ***/
 
 int main() {
     enableRawMode();
