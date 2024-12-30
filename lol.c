@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <termios.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 void enableRawMode() {
@@ -7,6 +8,10 @@ void enableRawMode() {
 
     tcgetattr(STDERR_FILENO, &raw);
 
+    /* 
+       ECHO : bitflag/field 
+       0000000000000000000000000000100 
+    */
     raw.c_lflag &= ~(ECHO);
 
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
