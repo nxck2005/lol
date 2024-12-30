@@ -20,9 +20,17 @@ void enableRawMode() {
        0000000000000000000000000000100 
     */
 
+    // Create copy of original terminal flags
     struct termios raw = original_termios;
+
+    // Disable Ctrl S and Ctrl Q (software flow control)
+    // and carriage return to make sure Ctrl M is read properly, and enter too
     raw.c_iflag &= ~(ICRNL | IXON);
+
+    // Turn off all output postprocessing, like adding of /r after /n automatically
     raw.c_oflag &= ~(OPOST);
+
+    // Turn off echo, canonical mode, Ctrl V, and sigterms
     raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
 
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
