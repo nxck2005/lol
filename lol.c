@@ -47,6 +47,12 @@ void enableRawMode() {
     // Although most systems should already have this
     raw.c_cflag |= (CS8);
 
+    /* Indexes into control character [cc] field */
+    /* VMIN sets min number of bytes of input needed before read() can return */
+    /* VTIME is max amount of time to wait before read() returns (in 10ths of sec)*/
+    raw.c_cc[VMIN] = 0;
+    raw.c_cc[VTIME] = 10;
+
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
 
@@ -55,14 +61,11 @@ void enableRawMode() {
 
 int main() {
     enableRawMode();
-
-    char c;
-
-    // Read 1 byte from stdin into c, and keep doing it
-    // until no more bytes to read, or c == q
-
-    while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q') {
-
+    
+    while (1) {
+        char c = '\0';
+        read(STDIN_FILENO, &c, 1);
+        
         // Check if input is a nonprintable character
         // If yes, print ASCII code
         // If not, print ASCII code with reference to character
