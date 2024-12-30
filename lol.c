@@ -40,6 +40,7 @@ int main() {
 
         // Check if input is a nonprintable character
         // If yes, print ASCII code
+        // If not, print ASCII code with reference to character
 
         if (iscntrl(c)) {
             printf("%d\n", c);
