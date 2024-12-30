@@ -2,6 +2,7 @@
 #include <termios.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 
 // State of terminal originally
 struct termios original_termios;
@@ -30,6 +31,20 @@ int main() {
     enableRawMode();
 
     char c;
-    while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q');
+
+    // Read 1 byte from stdin into c, and keep doing it
+    // until no more bytes to read, or c == q
+
+    while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q') {
+
+        // Check if input is a nonprintable character
+        // If yes, print ASCII code
+
+        if (iscntrl(c)) {
+            printf("%d\n", c);
+        } else {
+            printf("%d ('%c')\n", c, c);
+        }
+    }
     return 0;
 }
