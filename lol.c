@@ -23,15 +23,21 @@ void enableRawMode() {
     // Create copy of original terminal flags
     struct termios raw = original_termios;
 
-    // Disable Ctrl S and Ctrl Q (software flow control)
+    // Disable Ctrl S and Ctrl Q (software flow control) : IXON
     // and carriage return to make sure Ctrl M is read properly, and enter too
-    raw.c_iflag &= ~(ICRNL | IXON);
+    // (ICRNL)
+    // Rest are misc flags; by tradition
+    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
 
     // Turn off all output postprocessing, like adding of /r after /n automatically
     raw.c_oflag &= ~(OPOST);
 
     // Turn off echo, canonical mode, Ctrl V, and sigterms
     raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+
+    // Misc flag; turns character size to 8 bytes
+    // Although most systems should already have this
+    raw.c_cflag |= (CS8);
 
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
