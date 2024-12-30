@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <errno.h>
 
 
 
@@ -17,18 +18,21 @@ struct termios original_termios;
 
 /*** terminal ***/
 
+void die(const char *s) {
+    perror(s);
+    exit(1);
+}
+
 void disableRawMode() {
-    tcsetattr(STDERR_FILENO, TCSAFLUSH, &original_termios);
+    if (tcsetattr(STDERR_FILENO, TCSAFLUSH, &original_termios) == -1) die("tcsetattr");
 }
 
 void enableRawMode() {
-    tcgetattr(STDERR_FILENO, &original_termios);
+    if (tcgetattr(STDERR_FILENO, &original_termios) == -1) die("tcgetattr");
     atexit(disableRawMode);
 
-    /* 
-       ECHO : bitflag/field 
-       0000000000000000000000000000100 
-    */
+    /* ECHO : bitflag/field 
+       0000000000000000000000000000100  */
 
     // Create copy of original terminal flags
     struct termios raw = original_termios;
@@ -55,7 +59,7 @@ void enableRawMode() {
     raw.c_cc[VMIN] = 0;
     raw.c_cc[VTIME] = 10;
 
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    if (tcsetattr(STDERR_FILENO, TCSAFLUSH, &original_termios) == -1) die("tcsetattr");
 }
 
 
@@ -67,7 +71,7 @@ int main() {
     
     while (1) {
         char c = '\0';
-        read(STDIN_FILENO, &c, 1);
+        if (read(STDIN_FILENO, &c, 1) == -1 && errno != EAGAIN) die("read");
 
         // Check if input is a nonprintable character
         // If yes, print ASCII code
