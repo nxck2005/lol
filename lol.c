@@ -14,6 +14,7 @@
 /*** defines ***/
 
 /* Control key masks off bit 5 and 6 from the character */
+
 #define CTRL_KEY(k) ((k) & 0x1f)
 
 
@@ -22,6 +23,8 @@
 // State of terminal originally
 
 struct editorConfig {
+    int screenrows;
+    int screencols;
     struct termios originaltermios;
 };
 
@@ -51,27 +54,33 @@ void enableRawMode() {
        0000000000000000000000000000100  */
 
     // Create copy of original terminal flags
+
     struct termios raw = E.originaltermios;
 
     // Disable Ctrl S and Ctrl Q (software flow control) : IXON
     // and carriage return to make sure Ctrl M is read properly, and enter too
     // (ICRNL)
     // Rest are misc flags; by tradition
+
     raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
 
     // Turn off all output postprocessing, like adding of /r after /n automatically
+
     raw.c_oflag &= ~(OPOST);
 
     // Turn off echo, canonical mode, Ctrl V, and sigterms
+
     raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
 
     // Misc flag; turns character size to 8 bytes
     // Although most systems should already have this
+
     raw.c_cflag |= (CS8);
 
     /* Indexes into control character [cc] field */
     /* VMIN sets min number of bytes of input needed before read() can return */
     /* VTIME is max amount of time to wait before read() returns (in 10ths of sec)*/
+
     raw.c_cc[VMIN] = 0;
     raw.c_cc[VTIME] = 10;
 
@@ -80,6 +89,7 @@ void enableRawMode() {
 
 
 // Keypress reading at the lowest level
+
 char editorReadKey() {
     int nread;
     char c;
@@ -89,9 +99,20 @@ char editorReadKey() {
     return c;
 }
 
+
+// Place number of rows and columns into given arguments
+// Return value indicates degree of success
+
 int getWindowSize(int *rows, int *cols) {
+
+    // Has attributes like ws_col etc.
+
     struct winsize ws;
     
+    // Sets ws's col and row values
+    // By calling ioctl with the terminal as reference, and tio.. whatever
+    // as request, and setting it to ws
+
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
         return -1;
     } else {
@@ -124,9 +145,11 @@ void editorRefreshScreen() {
     write(STDOUT_FILENO, "\x1b[2J", 4);
 
     // Escape sequence to position cursor at 1,1
+
     write(STDOUT_FILENO, "\x1b[H", 3);
 
     // Print tildes on rows then reposition at 1,1 again
+
     editorDrawRows();
     write(STDOUT_FILENO, "\x1b[H", 3);
 
@@ -136,6 +159,7 @@ void editorRefreshScreen() {
 /*** input ***/
 
 // Map keypresses to input operations
+
 void editorProcessKeypress() {
     char c = editorReadKey();
 
@@ -151,8 +175,16 @@ void editorProcessKeypress() {
 
 /*** init ***/
 
+
+/* Initialize all the fields in the terminal struct, E */
+
+void initEditor() {
+    if (getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
+}
+
 int main() {
     enableRawMode();
+    initEditor();
     
     while (1) {
         editorRefreshScreen();
