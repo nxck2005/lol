@@ -79,6 +79,23 @@ char editorReadKey() {
 }
 
 
+/*** output ***/
+
+void editorRefreshScreen() {
+
+    /* 
+     * Write escape sequence for clearing the screen to the terminal.
+     * Esc sequences: 27 + [ + argument + command
+     * 27 is decimal for \x1b, called escape character
+     * command : J (Erase In Display) (VT100 sequences) 
+     * argument: 2 (clear the entire screen) 
+     */
+
+    write(STDOUT_FILENO, "\x1b[2j", 4);
+}
+
+
+
 /*** input ***/
 
 // Map keypresses to input operations
@@ -99,6 +116,7 @@ int main() {
     enableRawMode();
     
     while (1) {
+        editorRefreshScreen();
         editorProcessKeypress();
     }
     return 0;
