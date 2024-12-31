@@ -17,7 +17,12 @@
 /*** data ***/
 
 // State of terminal originally
-struct termios original_termios;
+
+struct editorConfig {
+    struct termios originaltermios;
+};
+
+struct editorConfig E;
 
 
 
@@ -32,18 +37,18 @@ void die(const char *s) {
 }
 
 void disableRawMode() {
-    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_termios) == -1) die("tcsetattr");
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.originaltermios) == -1) die("tcsetattr");
 }
 
 void enableRawMode() {
-    if (tcgetattr(STDIN_FILENO, &original_termios) == -1) die("tcgetattr");
+    if (tcgetattr(STDIN_FILENO, &E.originaltermios) == -1) die("tcgetattr");
     atexit(disableRawMode);
 
     /* ECHO : bitflag/field 
        0000000000000000000000000000100  */
 
     // Create copy of original terminal flags
-    struct termios raw = original_termios;
+    struct termios raw = E.originaltermios;
 
     // Disable Ctrl S and Ctrl Q (software flow control) : IXON
     // and carriage return to make sure Ctrl M is read properly, and enter too
