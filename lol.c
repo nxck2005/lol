@@ -84,6 +84,13 @@ char editorReadKey() {
 
 /*** output ***/
 
+void editorDrawRows() {
+    int y;
+    for (y = 0; y < 24; y++) {
+        write(STDOUT_FILENO, "~\r\n", 3);
+    }
+}
+
 void editorRefreshScreen() {
 
     /* 
@@ -98,8 +105,12 @@ void editorRefreshScreen() {
 
     // Escape sequence to position cursor at 1,1
     write(STDOUT_FILENO, "\x1b[H", 3);
-}
 
+    // Print tildes on rows then reposition at 1,1 again
+    editorDrawRows();
+    write(STDOUT_FILENO, "\x1b[H", 3);
+
+}
 
 
 /*** input ***/
