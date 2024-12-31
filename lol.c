@@ -8,6 +8,11 @@
 #include <errno.h>
 
 
+/*** defines ***/
+
+/* Control key masks off bit 5 and 6 from the character */
+#define CTRL_KEY(k) ((k) & 0x1f)
+
 
 /*** data ***/
 
@@ -75,13 +80,13 @@ int main() {
         // Check if input is a nonprintable character
         // If yes, print ASCII code
         // If not, print ASCII code with reference to character
-
+        if (c == CTRL_KEY('q')) break;
         if (iscntrl(c)) {
             printf("%d\r\n", c);
         } else {
             printf("%d ('%c')\r\n", c, c);
         }
-        if (c == 'q') break;
+        
     }
     return 0;
 }
