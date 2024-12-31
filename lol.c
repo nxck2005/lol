@@ -92,6 +92,9 @@ void editorRefreshScreen() {
      */
 
     write(STDOUT_FILENO, "\x1b[2J", 4);
+
+    // Escape sequence to position cursor at 1,1
+    write(STDOUT_FILENO, "\x1b[H", 3);
 }
 
 
