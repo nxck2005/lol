@@ -91,7 +91,7 @@ void editorRefreshScreen() {
      * argument: 2 (clear the entire screen) 
      */
 
-    write(STDOUT_FILENO, "\x1b[2j", 4);
+    write(STDOUT_FILENO, "\x1b[2J", 4);
 }
 
 
