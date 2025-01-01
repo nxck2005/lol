@@ -99,6 +99,36 @@ char editorReadKey() {
     return c;
 }
 
+/* Get current cursor position
+   Reply is a escame sequence; documented as Cursor Position Report
+   https://vt100.net/docs/vt100-ug/chapter3.html#CPR */
+
+int getCursorPosition(int *rows, int *cols) {
+
+    // Read response into a buffer
+    char buf[32];
+    unsigned int i = 0;
+
+    if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4) return -1;
+
+    while (i < sizeof(buf) - 1) {
+        if (read(STDIN_FILENO, &buf[i], 1) != 1) break;
+        
+        // Last character of response is R, hence
+        if (buf[i] == 'R') break;
+        i++;
+    }
+    // Append string terminator to last byte
+    buf[i] = '\0';
+
+    // Check for valid escape sequence
+    if (buf[0] != '\x1b' || buf[1] != '[') return -1;
+
+    // Use sscanf to parse the two numbers in that escape sequence
+    if (sscanf(&buf[2], "%d;%d", rows, cols) != 2) return -1;
+    return 0;
+}
+
 
 // Place number of rows and columns into given arguments
 // Return value indicates degree of success
@@ -114,7 +144,13 @@ int getWindowSize(int *rows, int *cols) {
     // as request, and setting it to ws
 
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
-        return -1;
+
+        /* If ioctl couldn't return size, 
+           Move cursor to bottom right, and observe result/get cursor pos */
+
+        if (write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12) != 12) return -1;
+        return getCursorPosition(rows, cols);
+
     } else {
         *cols = ws.ws_col;
         *rows = ws.ws_row;
