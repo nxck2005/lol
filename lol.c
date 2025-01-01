@@ -103,6 +103,7 @@ char editorReadKey() {
    Reply is a escame sequence; documented as Cursor Position Report
    https://vt100.net/docs/vt100-ug/chapter3.html#CPR */
 
+
 int getCursorPosition(int *rows, int *cols) {
 
     // Read response into a buffer
@@ -125,6 +126,7 @@ int getCursorPosition(int *rows, int *cols) {
     if (buf[0] != '\x1b' || buf[1] != '[') return -1;
 
     // Use sscanf to parse the two numbers in that escape sequence
+    // And put it in rows and cols
     if (sscanf(&buf[2], "%d;%d", rows, cols) != 2) return -1;
     return 0;
 }
