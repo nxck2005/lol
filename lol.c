@@ -100,7 +100,7 @@ char editorReadKey() {
 }
 
 /* Get current cursor position
-   Reply is a escame sequence; documented as Cursor Position Report
+   Reply is a escape sequence; documented as Cursor Position Report
    https://vt100.net/docs/vt100-ug/chapter3.html#CPR */
 
 
@@ -159,6 +159,33 @@ int getWindowSize(int *rows, int *cols) {
         return 0;
     }
 }
+
+
+/*** append buffer ***/
+
+/* 
+
+   To do one big write so whole screen updates at once,
+   replacing all write calls, with code that appends the string to a buffer,
+   and then write() this buffer out at the end. C doesn't have dynamic strings,
+   so creating our own dyn string type with one operation type: appending
+
+*/
+
+struct abuf {
+
+    // Pointer to buffer in memory
+    char *b;
+
+    // Length
+    int len;
+};
+
+
+// Constructor for abuf type
+#define ABUF_INIT {NULL, 0}
+
+
 
 
 /*** output ***/
