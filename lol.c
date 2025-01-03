@@ -9,6 +9,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <sys/ioctl.h>
+#include <string.h>
 
 
 /*** defines ***/
@@ -185,7 +186,25 @@ struct abuf {
 // Constructor for abuf type
 #define ABUF_INIT {NULL, 0}
 
+// Append operation on the dynamic string type
+void abAppend(struct abuf *ab, const char *s, int len) {
+    char *new = realloc(ab->b, ab->len + len);
 
+    // if allocation fails, return
+    if (new == NULL) return;
+
+    // Copies new string at the end of first string in reallocated space
+    memcpy(&new[ab->len], s, len);
+
+    // Point to new space now
+    ab->b = new;
+    ab->len += len;
+}
+
+// Destructor
+void abFree(struct abuf *ab) {
+    free(ab->b);
+}
 
 
 /*** output ***/
