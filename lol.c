@@ -235,6 +235,12 @@ void editorRefreshScreen() {
        draw rows using that buffer, then destruct it at the end 
     */
     struct abuf ab = ABUF_INIT;
+
+    // First, turn off cursor while repainting
+    // h, l : Set and Reset for different terminal features or "modes"
+    // argument ?25 : cursor hiding/showing
+
+    abAppend(&ab, "\x1b[?25l", 6);
     abAppend(&ab, "\x1b[2J", 4);
 
     // Escape sequence to position cursor at 1,1
@@ -245,6 +251,10 @@ void editorRefreshScreen() {
 
     editorDrawRows(&ab);
     abAppend(&ab, "\x1b[H", 3);
+
+    // Re-enable the cursor
+
+    abAppend(&ab, "\x1b[?25l", 6);
 
     // Write all changes and destruct
     write(STDOUT_FILENO, ab.b, ab.len);
