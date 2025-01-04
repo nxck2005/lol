@@ -209,13 +209,13 @@ void abFree(struct abuf *ab) {
 
 /*** output ***/
 
-void editorDrawRows() {
+void editorDrawRows(struct abuf *ab) {
     int y;
     for (y = 0; y < E.screenrows; y++) {
-        write(STDOUT_FILENO, "~", 1);
+        abAppend(ab, "~", 1);
 
         if (y < E.screenrows - 1) {
-            write(STDOUT_FILENO, "\r\n", 2);
+            abAppend(ab, "\r\n", 2);
         }
     }
 }
@@ -230,17 +230,25 @@ void editorRefreshScreen() {
      * argument: 2 (clear the entire screen) 
      */
 
-    write(STDOUT_FILENO, "\x1b[2J", 4);
+    /* 
+       buffer = ab 
+       draw rows using that buffer, then destruct it at the end 
+    */
+    struct abuf ab = ABUF_INIT;
+    abAppend(&ab, "\x1b[2J", 4);
 
     // Escape sequence to position cursor at 1,1
 
-    write(STDOUT_FILENO, "\x1b[H", 3);
+    abAppend(&ab, "\x1b[H", 3);
 
     // Print tildes on rows then reposition at 1,1 again
 
-    editorDrawRows();
-    write(STDOUT_FILENO, "\x1b[H", 3);
+    editorDrawRows(&ab);
+    abAppend(&ab, "\x1b[H", 3);
 
+    // Write all changes and destruct
+    write(STDOUT_FILENO, ab.b, ab.len);
+    abFree(&ab);
 }
 
 
