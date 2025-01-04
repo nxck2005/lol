@@ -1,7 +1,8 @@
 /* 
    LoL Editor source file.
-   Majorly just copied from the kilo source with an intent to learn,
+   Majorly inherited from the kilo source with an intent to learn,
    And to add new features on my own. 
+   @nxck2005
 */
 
 // Happy New Year!
@@ -54,6 +55,12 @@ void die(const char *s) {
 }
 
 void disableRawMode() {
+    
+    /* 
+       No change is made until all currently written data has been transmitted, 
+       at which point any received but unread data is also discarded.
+    */
+
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.originaltermios) == -1) die("tcsetattr");
 }
 
