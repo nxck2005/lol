@@ -1,3 +1,9 @@
+/* 
+   LoL Editor source file.
+   Majorly just copied from the kilo source with an intent to learn,
+   And to add new features on my own. 
+*/
+
 // Happy New Year!
 
 /*** includes ***/
@@ -13,6 +19,10 @@
 
 
 /*** defines ***/
+
+/* LoL version */
+
+#define LOL_VERSION "0.0.1"
 
 /* Control key masks off bit 5 and 6 from the character */
 
