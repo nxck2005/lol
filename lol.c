@@ -1,6 +1,6 @@
 /* 
    LoL Editor source file.
-   Majorly inherited from the kilo source with an intent to learn,
+   Majorly inherited from the kilo source code with an intent to learn,
    And to add new features on my own. 
    @nxck2005
 */
@@ -229,14 +229,68 @@ void abFree(struct abuf *ab) {
 void editorDrawRows(struct abuf *ab) {
     int y;
     for (y = 0; y < E.screenrows; y++) {
-        abAppend(ab, "~", 1);
+
+        /* If cursor is at specific position, print welcome msg there */
+
+        if (y == E.screenrows / 3) {
+
+            /* welcome screen */
+
+            /* buffer to hold formatted string */
+            char welcome[80];
+
+            /* 
+                snprintf writes a formatted string with a null terminator, 
+                into a char array. Write it to buffer for writing to abbuf
+            */
+
+            int welcomelen = snprintf(welcome, sizeof(welcome), 
+            "LoL : Lots Of Lines Editor -- version %s", LOL_VERSION);
+
+            /* Add padding to center the text */
+
+            /* 
+               To properly center a string, divide screen width by 2, 
+               then subtract half of the string's length. 
+               (cols/2) - (welcome/2) => (cols - welcome) / 2
+               
+               Tells us how far from the left edge of the screen to 
+               start printing.
+               Fill space with space characters, except first char is ~ 
+            */
+
+            int padding = (E.screencols - welcomelen) / 2;
+
+            /* Executed once, add one tilde, and reduce padding by 1 as one space is used */
+            if (padding) {
+                abAppend(ab, "~", 1);
+                padding--;
+            }
+
+            /* Fill remaining padding with spaces */
+            while (padding--) abAppend(ab, " ", 1);
+
+            /* if terminal is too small, truncate the message */
+
+            if (welcomelen > E.screencols) welcomelen = E.screencols;
+
+            /* Finally, append buffer to write dynamic buffer */
+
+            abAppend(ab, welcome, welcomelen);
+
+        } else {
+
+            /* Print tildes for every other row */
+            abAppend(ab, "~", 1);
+
+        }
 
         /* 
          * K command: Erase In Line
          * 0 : default argument, erases part of line to the right of the cursor
          * Hence clears entire row
          */
-        abAppend(ab, "\x1b[k", 3);
+        abAppend(ab, "\x1b[K", 3);
 
         if (y < E.screenrows - 1) {
             abAppend(ab, "\r\n", 2);
@@ -277,7 +331,7 @@ void editorRefreshScreen() {
 
     // Re-enable the cursor
 
-    abAppend(&ab, "\x1b[?25l", 6);
+    abAppend(&ab, "\x1b[?25h", 6);
 
     // Write all changes and destruct
     write(STDOUT_FILENO, ab.b, ab.len);
