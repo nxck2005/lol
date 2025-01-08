@@ -231,6 +231,13 @@ void editorDrawRows(struct abuf *ab) {
     for (y = 0; y < E.screenrows; y++) {
         abAppend(ab, "~", 1);
 
+        /* 
+         * K command: Erase In Line
+         * 0 : default argument, erases part of line to the right of the cursor
+         * Hence clears entire row
+         */
+        abAppend(ab, "\x1b[k", 3);
+
         if (y < E.screenrows - 1) {
             abAppend(ab, "\r\n", 2);
         }
@@ -258,7 +265,6 @@ void editorRefreshScreen() {
     // argument ?25 : cursor hiding/showing
 
     abAppend(&ab, "\x1b[?25l", 6);
-    abAppend(&ab, "\x1b[2J", 4);
 
     // Escape sequence to position cursor at 1,1
 
