@@ -325,9 +325,16 @@ void editorRefreshScreen() {
 
     abAppend(&ab, "\x1b[H", 3);
 
-    // Print tildes on rows then reposition at 1,1 again
+    // Print tildes on rows then reposition at needed cursor pos; cx cy
+    // passing cx and cy as args with %d;%d to H command
+    // add 1 to both coords to turn them 1 indexed
 
     editorDrawRows(&ab);
+
+    char buf[32];
+    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
+    abAppend(&ab, buf, strlen(buf));
+
     abAppend(&ab, "\x1b[H", 3);
 
     // Re-enable the cursor
