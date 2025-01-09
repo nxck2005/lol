@@ -40,9 +40,9 @@ enum editorKey {
     */
 
     ARROW_LEFT = 1000,
-    ARROW_RIGHT = 'l',
-    ARROW_UP = 'k',
-    ARROW_DOWN = 'j'
+    ARROW_RIGHT,
+    ARROW_UP,
+    ARROW_DOWN
 };
 
 
