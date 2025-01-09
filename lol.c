@@ -335,8 +335,6 @@ void editorRefreshScreen() {
     snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
     abAppend(&ab, buf, strlen(buf));
 
-    abAppend(&ab, "\x1b[H", 3);
-
     // Re-enable the cursor
 
     abAppend(&ab, "\x1b[?25h", 6);
@@ -351,6 +349,25 @@ void editorRefreshScreen() {
 
 // Map keypresses to input operations
 
+/* Move cursor using defined binds */
+
+void editorMoveCursor(char key) {
+    switch (key) {
+        case 'h':
+            E.cx--;
+            break;
+        case 'l':
+            E.cx++;
+            break;
+        case 'k':
+            E.cy--;
+            break;
+        case 'j':
+            E.cy++;
+            break;
+    }
+}
+
 void editorProcessKeypress() {
     char c = editorReadKey();
 
@@ -359,6 +376,14 @@ void editorProcessKeypress() {
             write(STDOUT_FILENO, "\x1b[2J", 4);
             write(STDOUT_FILENO, "\x1b[H", 3);
             exit(0);
+            break;
+        
+        /* process move keybinds */
+        case 'k':
+        case 'j':
+        case 'h':
+        case 'l':
+            editorMoveCursor(c);
             break;
     }
 }
