@@ -112,9 +112,56 @@ void enableRawMode() {
 char editorReadKey() {
     int nread;
     char c;
+
+    /* try read char, if erred, exit */
     while ((nread = read(STDIN_FILENO, &c, 1)) != 1) {
         if (nread == -1 && errno != EAGAIN) die("read");
     }
+
+    /* handle escape sequences, if the one byte read is esc char, proceed */
+    if (c == '\x1b') {
+        
+        /* temp buffer to help store arguments*/
+
+        char seq[3];
+
+        /* read next two bytes to parse arguments; if erred, return only the esc character */
+
+        if (read(STDIN_FILENO, &seq[0], 1) != 1) return '\x1b';
+        if (read(STDIN_FILENO, &seq[1], 1) != 1) return '\x1b';
+
+        /* 
+           check for control sequence introducer, [ 
+           if present, the next bytes are part of a escape sequence,
+           hence read them and parse them accordingly
+        */
+
+        if (seq[0] == '[') {
+            
+            /* cases for escape sequences */
+            
+            switch (seq[1]) {
+
+                /* alias arrow keys to hjkl */
+                case 'A': return 'h';
+                case 'B': return 'k';
+                case 'C': return 'l';
+                case 'D': return 'j';
+
+            }
+
+            return '\x1b';
+
+        } else {
+            
+            /* else, just return the char entered */
+
+            return c;
+        }
+    }
+
+    /* return regular character if it did not pass escape sequence check */
+
     return c;
 }
 
