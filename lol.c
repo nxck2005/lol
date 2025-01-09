@@ -29,6 +29,22 @@
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 
+/* editor key definition */
+
+enum editorKey {
+
+    /* 
+       giving arrow keys a big value for representation, 
+       that is out of range for a char so that they don't
+       conflict with ordinary keypresses
+    */
+
+    ARROW_LEFT = 1000,
+    ARROW_RIGHT = 'l',
+    ARROW_UP = 'k',
+    ARROW_DOWN = 'j'
+};
+
 
 /*** data ***/
 
@@ -109,7 +125,7 @@ void enableRawMode() {
 
 // Keypress reading at the lowest level
 
-char editorReadKey() {
+int editorReadKey() {
     int nread;
     char c;
 
@@ -142,11 +158,11 @@ char editorReadKey() {
             
             switch (seq[1]) {
 
-                /* alias arrow keys to hjkl */
-                case 'A': return 'h';
-                case 'B': return 'k';
-                case 'C': return 'l';
-                case 'D': return 'j';
+                /* alias arrow keys to arrow keys, defined above */
+                case 'A': return ARROW_UP;
+                case 'B': return ARROW_DOWN;
+                case 'C': return ARROW_RIGHT;
+                case 'D': return ARROW_LEFT;
 
             }
 
@@ -398,25 +414,25 @@ void editorRefreshScreen() {
 
 /* Move cursor using defined binds */
 
-void editorMoveCursor(char key) {
+void editorMoveCursor(int key) {
     switch (key) {
-        case 'h':
+        case ARROW_LEFT:
             E.cx--;
             break;
-        case 'l':
+        case ARROW_RIGHT:
             E.cx++;
             break;
-        case 'k':
+        case ARROW_UP:
             E.cy--;
             break;
-        case 'j':
+        case ARROW_DOWN:
             E.cy++;
             break;
     }
 }
 
 void editorProcessKeypress() {
-    char c = editorReadKey();
+    int c = editorReadKey();
 
     switch (c) {
         case CTRL_KEY('q'):
@@ -427,10 +443,10 @@ void editorProcessKeypress() {
             break;
         
         /* process move keybinds */
-        case 'k':
-        case 'j':
-        case 'h':
-        case 'l':
+        case ARROW_UP:
+        case ARROW_DOWN:
+        case ARROW_LEFT:
+        case ARROW_RIGHT:
             editorMoveCursor(c);
             break;
     }
