@@ -416,17 +416,32 @@ void editorRefreshScreen() {
 
 void editorMoveCursor(int key) {
     switch (key) {
+
+        /* 
+           the if's are checks to prevent cursor from moving off screen,
+           by not letting the cx and cy values go into the negatives,
+           or go past the right and bottom edges of the screen 
+        */
+
         case ARROW_LEFT:
-            E.cx--;
+            if (E.cx != 0) {
+                E.cx--;
+            }
             break;
         case ARROW_RIGHT:
-            E.cx++;
+            if (E.cx != E.screencols - 1) {
+                E.cx++;
+            }
             break;
         case ARROW_UP:
-            E.cy--;
+            if (E.cy != 0) {
+                E.cy--;
+            }
             break;
         case ARROW_DOWN:
-            E.cy++;
+            if (E.cy != E.screenrows - 1) {
+                E.cy++;
+            }
             break;
     }
 }
