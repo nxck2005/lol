@@ -53,12 +53,20 @@ enum editorKey {
 
 /*** data ***/
 
+// Data type for storing a row of text
+typedef struct erow {
+    int size;
+    char *chars;
+} erow;
+
 // State of terminal originally
 
 struct editorConfig {
     int cx, cy;
     int screenrows;
     int screencols;
+    int numrows;
+    erow row;
     struct termios originaltermios;
 };
 
@@ -507,6 +515,7 @@ void editorProcessKeypress() {
 void initEditor() {
     E.cx = 0;
     E.cy = 0;
+    E.numrows = 0;
     if (getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
 }
 
