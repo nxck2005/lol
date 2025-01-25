@@ -266,6 +266,10 @@ int getWindowSize(int *rows, int *cols) {
 }
 
 
+/*** file i/o ***/
+
+
+
 /*** append buffer ***/
 
 /* 
