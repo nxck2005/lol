@@ -42,7 +42,9 @@ enum editorKey {
     ARROW_LEFT = 1000,
     ARROW_RIGHT,
     ARROW_UP,
-    ARROW_DOWN
+    ARROW_DOWN,
+    PAGE_UP,
+    PAGE_DOWN
 };
 
 
@@ -136,49 +138,47 @@ int editorReadKey() {
 
     /* handle escape sequences, if the one byte read is esc char, proceed */
     if (c == '\x1b') {
-        
-        /* temp buffer to help store arguments*/
-
+        /* temp buffer to help store arguments */
         char seq[3];
 
         /* read next two bytes to parse arguments; if erred, return only the esc character */
-
         if (read(STDIN_FILENO, &seq[0], 1) != 1) return '\x1b';
         if (read(STDIN_FILENO, &seq[1], 1) != 1) return '\x1b';
 
-        /* 
-           check for control sequence introducer, [ 
+        /**
+           check for control sequence introducer, [
            if present, the next bytes are part of a escape sequence,
            hence read them and parse them accordingly
-        */
-
+        **/
         if (seq[0] == '[') {
-            
-            /* cases for escape sequences */
-            
-            switch (seq[1]) {
-
+            /* Handle extended escape sequences that include numbers (e.g., page up/down) */
+            if (seq[1] >= '0' && seq[1] <= '9') {
+                /* Read the final byte of the extended sequence */
+                if (read(STDIN_FILENO, &seq[2], 1) != 1) return '\x1b';
+                /* Check for the terminating character '~' */
+                if (seq[2] == '~') {
+                    switch (seq[1]) {
+                        case '5': return PAGE_UP;    /* \x1b[5~ = page up */
+                        case '6': return PAGE_DOWN;  /* \x1b[6~ = page down */
+                    }
+                }
+            } else {
+                /* cases for escape sequences */
                 /* alias arrow keys to arrow keys, defined above */
-                case 'A': return ARROW_UP;
-                case 'B': return ARROW_DOWN;
-                case 'C': return ARROW_RIGHT;
-                case 'D': return ARROW_LEFT;
-
+                switch (seq[1]) {
+                    case 'A': return ARROW_UP;     /* \x1b[A = up arrow */
+                    case 'B': return ARROW_DOWN;   /* \x1b[B = down arrow */
+                    case 'C': return ARROW_RIGHT;  /* \x1b[C = right arrow */
+                    case 'D': return ARROW_LEFT;   /* \x1b[D = left arrow */
+                }
             }
-
-            return '\x1b';
-
-        } else {
-            
-            /* else, just return the char entered */
-
-            return c;
         }
+        /* Return ESC if sequence wasn't recognized */
+        return '\x1b';
+    } else {
+        /* else, just return the char entered */
+        return c;
     }
-
-    /* return regular character if it did not pass escape sequence check */
-
-    return c;
 }
 
 /* Get current cursor position
