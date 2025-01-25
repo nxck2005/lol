@@ -43,6 +43,8 @@ enum editorKey {
     ARROW_RIGHT,
     ARROW_UP,
     ARROW_DOWN,
+    HOME_KEY,
+    END_KEY,
     PAGE_UP,
     PAGE_DOWN
 };
@@ -158,8 +160,12 @@ int editorReadKey() {
                 /* Check for the terminating character '~' */
                 if (seq[2] == '~') {
                     switch (seq[1]) {
+                        case '1': return HOME_KEY;   /* \x1b[1~ = home key*/
+                        case '4': return END_KEY;    /* \x1b[4~ = end key */
                         case '5': return PAGE_UP;    /* \x1b[5~ = page up */
                         case '6': return PAGE_DOWN;  /* \x1b[6~ = page down */
+                        case '7': return HOME_KEY;   /* \x1b[7~ = home key*/
+                        case '8': return END_KEY;    /* \x1b[8~ = end key */
                     }
                 }
             } else {
@@ -170,7 +176,14 @@ int editorReadKey() {
                     case 'B': return ARROW_DOWN;   /* \x1b[B = down arrow */
                     case 'C': return ARROW_RIGHT;  /* \x1b[C = right arrow */
                     case 'D': return ARROW_LEFT;   /* \x1b[D = left arrow */
+                    case 'H': return HOME_KEY;     /* \x1b[H = home key */
+                    case 'F': return END_KEY;      /* \x1b[F = end key */
                 }
+            }
+        } else if (seq[0] == 'O') {
+            switch (seq[1]) {
+                case 'H': return HOME_KEY;
+                case 'F': return END_KEY;
             }
         }
         /* Return ESC if sequence wasn't recognized */
@@ -455,6 +468,22 @@ void editorProcessKeypress() {
             write(STDOUT_FILENO, "\x1b[2J", 4);
             write(STDOUT_FILENO, "\x1b[H", 3);
             exit(0);
+            break;
+
+        case HOME_KEY:
+            E.cx = 0;
+            break;
+
+        case END_KEY:
+            E.cx = E.screencols - 1;
+            break;
+
+        case PAGE_UP:
+        case PAGE_DOWN:
+            {
+                int times = E.screenrows;
+                while (times--) editorMoveCursor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
+            }
             break;
         
         /* process move keybinds */
