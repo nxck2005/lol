@@ -43,6 +43,7 @@ enum editorKey {
     ARROW_RIGHT,
     ARROW_UP,
     ARROW_DOWN,
+    DEL_KEY,
     HOME_KEY,
     END_KEY,
     PAGE_UP,
@@ -160,7 +161,8 @@ int editorReadKey() {
                 /* Check for the terminating character '~' */
                 if (seq[2] == '~') {
                     switch (seq[1]) {
-                        case '1': return HOME_KEY;   /* \x1b[1~ = home key*/
+                        case '1': return HOME_KEY;   /* \x1b[1~ = home key */
+                        case '3': return DEL_KEY;    /* \x1b[3~ = del key */
                         case '4': return END_KEY;    /* \x1b[4~ = end key */
                         case '5': return PAGE_UP;    /* \x1b[5~ = page up */
                         case '6': return PAGE_DOWN;  /* \x1b[6~ = page down */
