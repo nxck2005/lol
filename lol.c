@@ -23,7 +23,7 @@
 
 /* LoL version */
 
-#define LOL_VERSION "0.0.1"
+#define LOL_VERSION "0.0.2"
 
 /* Control key masks off bit 5 and 6 from the character */
 

@@ -1,7 +1,6 @@
 # lol: Lots Of Lines, a kilo fork
 
 A minimalist terminal-based text editor written in C, focused on performance and efficiency.
-Currently, this is just Kilo, built as a learning project. But, I will add more features as my contribution to the editor.
 
 ## Features
 
